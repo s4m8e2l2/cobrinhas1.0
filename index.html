@@ -18,14 +18,20 @@
             display: block;
         }
         .buttons {
-            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             margin-top: 10px;
         }
         button {
-            font-size: 20px;
-            padding: 10px;
+            font-size: 24px;
+            padding: 15px;
             margin: 5px;
             cursor: pointer;
+            background: #444;
+            color: white;
+            border: none;
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -41,27 +47,19 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        // Ajustando tamanho da tela automaticamente
-        canvas.width = window.innerWidth * 0.9;
-        canvas.height = window.innerHeight * 0.7;
+        // Ajuste para o tamanho da tela de um celular de 6 polegadas
+        canvas.width = window.innerWidth * 0.8;
+        canvas.height = window.innerHeight * 0.6;
 
-        const box = 20;
-        let snake = [{ x: 10 * box, y: 10 * box }];
+        const box = 30; // Blocos maiores para melhor visibilidade
+        let snake = [{ x: 5 * box, y: 5 * box }];
         let direction = "RIGHT";
         let food = {
             x: Math.floor(Math.random() * (canvas.width / box)) * box,
             y: Math.floor(Math.random() * (canvas.height / box)) * box
         };
         let score = 0;
-        let speed = 200; // Velocidade inicial mais lenta
-
-        document.addEventListener("keydown", function(event) {
-            const key = event.keyCode;
-            if (key === 37 && direction !== "RIGHT") direction = "LEFT";
-            else if (key === 38 && direction !== "DOWN") direction = "UP";
-            else if (key === 39 && direction !== "LEFT") direction = "RIGHT";
-            else if (key === 40 && direction !== "UP") direction = "DOWN";
-        });
+        let speed = 300; // Velocidade inicial mais lenta
 
         function changeDirection(newDirection) {
             if ((newDirection === "LEFT" && direction !== "RIGHT") ||
@@ -85,8 +83,8 @@
                 ctx.fillStyle = "white";
 
                 if (i === 0) {
-                    ctx.font = "18px Arial";
-                    ctx.fillText("😊", snake[i].x + 3, snake[i].y + 16);
+                    ctx.font = "24px Arial";
+                    ctx.fillText("😊", snake[i].x + 5, snake[i].y + 22);
                 }
             }
 
@@ -104,7 +102,7 @@
                     y: Math.floor(Math.random() * (canvas.height / box)) * box
                 };
                 score++; // Incrementa a pontuação
-                speed -= 10; // Aumenta a velocidade a cada comida
+                speed -= 20; // Aumenta a velocidade conforme a cobra come
             } else {
                 snake.pop();
             }
@@ -128,7 +126,7 @@
             // Exibir mensagem quando comer 5 blocos
             if (score >= 5) {
                 ctx.fillStyle = "white";
-                ctx.font = "24px Arial";
+                ctx.font = "28px Arial";
                 ctx.fillText("Oi denguinha, te amo 💕", canvas.width / 4, canvas.height / 2);
             }
 
