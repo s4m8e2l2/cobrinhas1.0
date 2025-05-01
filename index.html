@@ -10,12 +10,15 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background: black;
+            background: yellow;
             color: white;
+            position: relative;
         }
         canvas {
             background: black;
             display: block;
+            width: 50vw; /* Reduzindo pela metade */
+            height: 40vh; /* Ajuste para ocupar metade da tela */
         }
         .buttons {
             display: flex;
@@ -33,9 +36,22 @@
             border: none;
             border-radius: 8px;
         }
+        .heart-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Heart_icon_blue.svg/1200px-Heart_icon_blue.svg.png');
+            background-repeat: repeat;
+            background-size: 50px;
+            opacity: 0.3;
+        }
     </style>
 </head>
 <body>
+    <div class="heart-background"></div>
     <canvas id="gameCanvas"></canvas>
     <div class="buttons">
         <button onclick="changeDirection('UP')">⬆️</button><br>
@@ -47,11 +63,7 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        // Ajuste para o tamanho da tela de um celular de 6 polegadas
-        canvas.width = window.innerWidth * 0.8;
-        canvas.height = window.innerHeight * 0.6;
-
-        const box = 30; // Blocos maiores para melhor visibilidade
+        const box = 30; 
         let snake = [{ x: 5 * box, y: 5 * box }];
         let direction = "RIGHT";
         let food = {
@@ -59,7 +71,7 @@
             y: Math.floor(Math.random() * (canvas.height / box)) * box
         };
         let score = 0;
-        let speed = 300; // Velocidade inicial mais lenta
+        let speed = 300; 
 
         function changeDirection(newDirection) {
             if ((newDirection === "LEFT" && direction !== "RIGHT") ||
@@ -101,13 +113,12 @@
                     x: Math.floor(Math.random() * (canvas.width / box)) * box,
                     y: Math.floor(Math.random() * (canvas.height / box)) * box
                 };
-                score++; // Incrementa a pontuação
-                speed -= 20; // Aumenta a velocidade conforme a cobra come
+                score++; 
+                speed -= 20; 
             } else {
                 snake.pop();
             }
 
-            // Permitir que a cobra atravesse as paredes
             if (snakeX < 0) snakeX = canvas.width - box;
             if (snakeY < 0) snakeY = canvas.height - box;
             if (snakeX >= canvas.width) snakeX = 0;
@@ -115,7 +126,6 @@
 
             let newHead = { x: snakeX, y: snakeY };
 
-            // Verifica se a cobra colidiu consigo mesma
             if (snake.some(segment => segment.x === snakeX && segment.y === snakeY)) {
                 alert("Fim de jogo!");
                 location.reload();
@@ -123,14 +133,13 @@
 
             snake.unshift(newHead);
 
-            // Exibir mensagem quando comer 5 blocos
             if (score >= 5) {
                 ctx.fillStyle = "white";
                 ctx.font = "28px Arial";
                 ctx.fillText("Oi denguinha, te amo 💕", canvas.width / 4, canvas.height / 2);
             }
 
-            setTimeout(draw, speed); // Controlando a velocidade de movimento
+            setTimeout(draw, speed);
         }
 
         draw();
