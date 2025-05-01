@@ -53,6 +53,7 @@
             y: Math.floor(Math.random() * (canvas.height / box)) * box
         };
         let score = 0;
+        let speed = 200; // Velocidade inicial mais lenta
 
         document.addEventListener("keydown", function(event) {
             const key = event.keyCode;
@@ -103,6 +104,7 @@
                     y: Math.floor(Math.random() * (canvas.height / box)) * box
                 };
                 score++; // Incrementa a pontuação
+                speed -= 10; // Aumenta a velocidade a cada comida
             } else {
                 snake.pop();
             }
@@ -129,9 +131,11 @@
                 ctx.font = "24px Arial";
                 ctx.fillText("Oi denguinha, te amo 💕", canvas.width / 4, canvas.height / 2);
             }
+
+            setTimeout(draw, speed); // Controlando a velocidade de movimento
         }
 
-        setInterval(draw, 100);
+        draw();
     </script>
 </body>
 </html>
