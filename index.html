@@ -17,8 +17,8 @@
         canvas {
             background: black;
             display: block;
-            width: 50vw; /* Reduzindo pela metade */
-            height: 40vh; /* Ajuste para ocupar metade da tela */
+            width: 70vw; /* Aumento de 40% no tamanho */
+            height: 60vh; /* Ajuste para melhor jogabilidade */
         }
         .buttons {
             display: flex;
@@ -63,7 +63,7 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        const box = 30; 
+        const box = 35; // Blocos maiores para melhor visibilidade
         let snake = [{ x: 5 * box, y: 5 * box }];
         let direction = "RIGHT";
         let food = {
@@ -71,7 +71,7 @@
             y: Math.floor(Math.random() * (canvas.height / box)) * box
         };
         let score = 0;
-        let speed = 300; 
+        let speed = 300; // Velocidade inicial mais lenta
 
         function changeDirection(newDirection) {
             if ((newDirection === "LEFT" && direction !== "RIGHT") ||
