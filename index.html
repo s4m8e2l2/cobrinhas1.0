@@ -12,13 +12,12 @@
             height: 100vh;
             background: yellow;
             color: white;
-            position: relative;
         }
         canvas {
             background: black;
             display: block;
-            width: 70vw; /* Aumento de 40% no tamanho */
-            height: 60vh; /* Ajuste para melhor jogabilidade */
+            width: 90vw;
+            height: 70vh;
         }
         .buttons {
             display: flex;
@@ -36,22 +35,9 @@
             border: none;
             border-radius: 8px;
         }
-        .heart-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Heart_icon_blue.svg/1200px-Heart_icon_blue.svg.png');
-            background-repeat: repeat;
-            background-size: 50px;
-            opacity: 0.3;
-        }
     </style>
 </head>
 <body>
-    <div class="heart-background"></div>
     <canvas id="gameCanvas"></canvas>
     <div class="buttons">
         <button onclick="changeDirection('UP')">⬆️</button><br>
@@ -63,7 +49,7 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        const box = 35; // Blocos maiores para melhor visibilidade
+        const box = 40; // Ajuste para melhor jogabilidade em celular
         let snake = [{ x: 5 * box, y: 5 * box }];
         let direction = "RIGHT";
         let food = {
@@ -71,7 +57,6 @@
             y: Math.floor(Math.random() * (canvas.height / box)) * box
         };
         let score = 0;
-        let speed = 300; // Velocidade inicial mais lenta
 
         function changeDirection(newDirection) {
             if ((newDirection === "LEFT" && direction !== "RIGHT") ||
@@ -96,7 +81,7 @@
 
                 if (i === 0) {
                     ctx.font = "24px Arial";
-                    ctx.fillText("😊", snake[i].x + 5, snake[i].y + 22);
+                    ctx.fillText("😊", snake[i].x + 5, snake[i].y + 30);
                 }
             }
 
@@ -113,12 +98,12 @@
                     x: Math.floor(Math.random() * (canvas.width / box)) * box,
                     y: Math.floor(Math.random() * (canvas.height / box)) * box
                 };
-                score++; 
-                speed -= 20; 
+                score++; // Incrementa a pontuação
             } else {
                 snake.pop();
             }
 
+            // Permitir que a cobra atravesse as paredes
             if (snakeX < 0) snakeX = canvas.width - box;
             if (snakeY < 0) snakeY = canvas.height - box;
             if (snakeX >= canvas.width) snakeX = 0;
@@ -133,13 +118,13 @@
 
             snake.unshift(newHead);
 
-            if (score >= 5) {
+            if (score >= 3) {
                 ctx.fillStyle = "white";
                 ctx.font = "28px Arial";
-                ctx.fillText("Oi denguinha, te amo 💕", canvas.width / 4, canvas.height / 2);
+                ctx.fillText("Oi denguinha!", canvas.width / 4, canvas.height / 2);
             }
 
-            setTimeout(draw, speed);
+            setTimeout(draw, 150); // Velocidade ajustada para celular
         }
 
         draw();
