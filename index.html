@@ -9,10 +9,26 @@
             display: block;
             margin: auto;
         }
+        .buttons {
+            text-align: center;
+            margin-top: 10px;
+        }
+        button {
+            font-size: 20px;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="buttons">
+        <button onclick="changeDirection('UP')">⬆️</button><br>
+        <button onclick="changeDirection('LEFT')">⬅️</button>
+        <button onclick="changeDirection('DOWN')">⬇️</button>
+        <button onclick="changeDirection('RIGHT')">➡️</button>
+    </div>
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
@@ -25,14 +41,21 @@
             y: Math.floor(Math.random() * (canvas.height / box)) * box
         };
 
-        document.addEventListener("keydown", changeDirection);
-
-        function changeDirection(event) {
+        document.addEventListener("keydown", function(event) {
             const key = event.keyCode;
             if (key === 37 && direction !== "RIGHT") direction = "LEFT";
             else if (key === 38 && direction !== "DOWN") direction = "UP";
             else if (key === 39 && direction !== "LEFT") direction = "RIGHT";
             else if (key === 40 && direction !== "UP") direction = "DOWN";
+        });
+
+        function changeDirection(newDirection) {
+            if ((newDirection === "LEFT" && direction !== "RIGHT") ||
+                (newDirection === "UP" && direction !== "DOWN") ||
+                (newDirection === "RIGHT" && direction !== "LEFT") ||
+                (newDirection === "DOWN" && direction !== "UP")) {
+                direction = newDirection;
+            }
         }
 
         function draw() {
