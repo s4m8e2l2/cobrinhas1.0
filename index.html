@@ -1,70 +1,174 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-const box = 20;
-let snake = [{ x: 10 * box, y: 10 * box }];
-let direction = "RIGHT";
-let food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
-let score = 0;
-
-document.addEventListener("keydown", changeDirection);
-
-function changeDirection(event) {
-    const key = event.keyCode;
-    if (key === 37 && direction !== "RIGHT") direction = "LEFT";
-    else if (key === 38 && direction !== "DOWN") direction = "UP";
-    else if (key === 39 && direction !== "LEFT") direction = "RIGHT";
-    else if (key === 40 && direction !== "UP") direction = "DOWN";
-}
-
-function draw() {
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    for (let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = i === 0 ? "green" : "lightgreen";
-        ctx.fillRect(snake[i].x, snake[i].y, box, box);
-    }
-
-    ctx.fillStyle = "red";
-    ctx.fillRect(food.x, food.y, box, box);
-
-    let snakeX = snake[0].x;
-    let snakeY = snake[0].y;
-
-    if (direction === "LEFT") snakeX -= box;
-    if (direction === "UP") snakeY -= box;
-    if (direction === "RIGHT") snakeX += box;
-    if (direction === "DOWN") snakeY += box;
-
-    if (snakeX === food.x && snakeY === food.y) {
-        score++;
-        if (score === 3) {
-            alert("Oi denguinha!");
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <title>Jogo da Cobrinha - Versão Final</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
         }
-        food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
-    } else {
-        snake.pop();
-    }
-
-    let newHead = { x: snakeX, y: snakeY };
-
-    if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
-        alert("Game Over!");
-        document.location.reload();
-    }
-
-    snake.unshift(newHead);
-}
-
-function collision(head, array) {
-    for (let i = 0; i < array.length; i++) {
-        if (head.x === array[i].x && head.y === array[i].y) {
-            return true;
+        canvas {
+            border: 2px solid black;
+            background: url('https://www.publicdomainpictures.net/pictures/320000/velka/green-grass-background.jpg') center/cover;
         }
-    }
-    return false;
-}
+    </style>
+</head>
+<body>
+    <button id="startButton">Iniciar Jogo</button>
+    <canvas id="gameCanvas" width="500" height="400"></canvas>
 
-setInterval(draw, 100);
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
 
+        const box = 30;
+        let snake, direction, food, score, gameRunning, emoji, speed;
+        let levelTwo = false;
+        let cat, rats;
+        let ratSpeed = 1000;
+        let magneticField = false;
+        let magneticDuration = 2000; 
+
+        function resetGame() {
+            snake = [{ x: 10 * box, y: 10 * box }];
+            direction = "RIGHT";
+            food = { x: Math.floor(Math.random() * 15) * box, y: Math.floor(Math.random() * 10) * box };
+            score = 0;
+            speed = 200;
+            emoji = "🐹"; // Sempre será um hamster
+            levelTwo = false;
+            rats = [];
+            gameRunning = false;
+            magneticField = false;
+        }
+
+        resetGame();
+
+        document.addEventListener("keydown", (event) => {
+            if (event.code === "ArrowUp" && direction !== "DOWN") direction = "UP";
+            else if (event.code === "ArrowDown" && direction !== "UP") direction = "DOWN";
+            else if (event.code === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+            else if (event.code === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+            else if (event.code === "Space") activateMagneticField();
+        });
+
+        function activateMagneticField() {
+            if (!magneticField) {
+                magneticField = true;
+                setTimeout(() => {
+                    magneticField = false;
+                }, magneticDuration);
+            }
+        }
+
+        function moveSnake() {
+            let head = { ...snake[0] };
+
+            if (direction === "UP") head.y -= box;
+            else if (direction === "DOWN") head.y += box;
+            else if (direction === "LEFT") head.x -= box;
+            else if (direction === "RIGHT") head.x += box;
+
+            if (head.x < 0) head.x = canvas.width - box;
+            else if (head.x >= canvas.width) head.x = 0;
+            else if (head.y < 0) head.y = canvas.height - box;
+            else if (head.y >= canvas.height) head.y = 0;
+
+            snake.unshift(head);
+            if (!checkCollision()) snake.pop();
+        }
+
+        function shootRat() {
+            if (levelTwo) {
+                let rat = { x: cat.x, y: cat.y };
+                rats.push(rat);
+                setTimeout(shootRat, ratSpeed);
+            }
+        }
+
+        function moveRats() {
+            rats.forEach(rat => {
+                rat.x += (snake[0].x - rat.x) > 0 ? box / 4 : -box / 4;
+                rat.y += (snake[0].y - rat.y) > 0 ? box / 4 : -box / 4;
+            });
+
+            rats = rats.filter(rat => rat.y < canvas.height);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "black";
+            ctx.fillText(`Pontuação: ${score}`, 10, 20);
+            ctx.font = `${box}px Arial`;
+            ctx.fillText(emoji, snake[0].x, snake[0].y);
+            ctx.fillText("🍎", food.x, food.y);
+
+            if (levelTwo) {
+                ctx.fillText("🐱", cat.x, cat.y);
+                rats.forEach(rat => ctx.fillText("🐭", rat.x, rat.y));
+
+                if (magneticField) {
+                    ctx.beginPath();
+                    ctx.arc(snake[0].x + box / 2, snake[0].y + box / 2, box * 2, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(0, 0, 255, 0.3)";
+                    ctx.fill();
+                }
+            }
+        }
+
+        function checkCollision() {
+            if (Math.abs(snake[0].x - food.x) < box && Math.abs(snake[0].y - food.y) < box) {
+                food = { x: Math.floor(Math.random() * 15) * box, y: Math.floor(Math.random() * 10) * box };
+                score++;
+
+                if (score === 10) {
+                    levelTwo = true;
+                    cat = { x: Math.floor(Math.random() * 15) * box, y: Math.floor(Math.random() * 10) * box };
+                    alert("Agora um gato apareceu e atira ratos! 🐱🐭 Cuidado!");
+                    shootRat();
+                }
+
+                if (score === 20) {
+                    alert("Parabéns! Te amo, Amouza. Teligente! 💖🍏🎉");
+                    resetGame();
+                    document.getElementById("startButton").style.display = "block";
+                    return false;
+                }
+
+                return true;
+            }
+
+            rats.forEach((rat, index) => {
+                if (snake[0].x === rat.x && snake[0].y === rat.y) {
+                    alert("Game Over! Um rato atingiu o hamster! 🐭💥");
+                    resetGame();
+                    document.getElementById("startButton").style.display = "block";
+                    return false;
+                }
+
+                if (magneticField && Math.hypot(rat.x - snake[0].x, rat.y - snake[0].y) < box * 2) {
+                    rats.splice(index, 1);
+                }
+            });
+
+            return false;
+        }
+
+        function gameLoop() {
+            if (gameRunning) {
+                moveSnake();
+                moveRats();
+                draw();
+                setTimeout(gameLoop, speed);
+            }
+        }
+
+        document.getElementById("startButton").addEventListener("click", () => {
+            gameRunning = true;
+            gameLoop();
+            document.getElementById("startButton").style.display = "none";
+        });
+
+    </script>
+</body>
+</html>
